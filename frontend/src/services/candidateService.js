@@ -3,6 +3,7 @@ export function normalizeUploadToCandidate(uploadResult, index = 0) {
   const contact = parsed.contact_info ?? {};
   const skills = Array.isArray(parsed.skills) ? parsed.skills : [];
   const education = Array.isArray(parsed.education) ? parsed.education : [];
+  const score = parsed.score ?? parsed.overall_score ?? null;
 
   return {
     id: uploadResult?.file_path || parsed.filename || `candidate-${index}`,
@@ -15,9 +16,9 @@ export function normalizeUploadToCandidate(uploadResult, index = 0) {
     degree: parsed.degree || education[1] || "Not extracted",
     cgpa: parsed.normalized_cgpa ?? parsed.cgpa ?? null,
     skills,
-    score: parsed.score ?? parsed.overall_score ?? null,
+    score,
     confidence: parsed.confidence ?? "Unavailable",
-    status: parsed.allocation && parsed.allocation !== "Unscored" ? parsed.allocation : parsed.parse_quality || "Parsed",
+    status: parsed.allocation && parsed.allocation !== "Unscored" ? parsed.allocation : typeof score === "number" ? "Scored" : parsed.parse_quality || "Parsed",
     raw: uploadResult,
   };
 }

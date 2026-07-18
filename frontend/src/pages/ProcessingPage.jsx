@@ -20,6 +20,10 @@ const stageDefinitions = [
 export default function ProcessingPage() {
   const { isUploading, lastError, uploadQueue, uploadResults } = useAppData();
   const hasResults = uploadResults.length > 0;
+  const hasScoredResults = uploadResults.some((result) => {
+    const parsed = result.parsed_data ?? {};
+    return typeof (parsed.score ?? parsed.overall_score) === "number";
+  });
   const parsedCount = uploadQueue.filter((item) => item.status === "Parsed").length;
   const pendingCount = isUploading ? uploadQueue.filter((item) => !["Parsed", "Failed"].includes(item.status)).length : 0;
   const currentFile = isUploading ? uploadQueue.find((item) => !["Parsed", "Failed"].includes(item.status))?.name || "None" : "None";
@@ -31,14 +35,14 @@ export default function ProcessingPage() {
     ? uploadQueue.map((item) => ({ name: item.name, status: item.status }))
     : uploadResults.map((result) => ({
       name: result.parsed_data?.filename || result.file_path,
-      status: result.parsed_data?.parse_quality || "Parsed",
+      status: typeof (result.parsed_data?.score ?? result.parsed_data?.overall_score) === "number" ? "Scored" : result.parsed_data?.parse_quality || "Parsed",
     }));
   const progress = uploadQueue.length ? Math.round((parsedCount / uploadQueue.length) * 100) : uploadResults.length ? 100 : 0;
 
   return (
     <>
       <PageHeader
-        actions={<StatusBadge tone={lastError ? "failed" : isUploading ? "processing" : uploadResults.length ? "completed" : "medium"}>{lastError ? "Upload Error" : isUploading ? "Processing" : uploadResults.length ? "Parsed" : "Idle"}</StatusBadge>}
+        actions={<StatusBadge tone={lastError ? "failed" : isUploading ? "processing" : uploadResults.length ? "completed" : "medium"}>{lastError ? "Upload Error" : isUploading ? "Processing" : hasScoredResults ? "Scored" : uploadResults.length ? "Parsed" : "Idle"}</StatusBadge>}
         description="The current backend upload endpoint parses synchronously, so the UI reports actual queued/uploaded states rather than fake live stage percentages."
         title="Processing Pipeline"
       />
