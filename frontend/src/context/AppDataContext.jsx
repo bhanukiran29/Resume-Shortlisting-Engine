@@ -5,16 +5,19 @@ import { buildAnalytics } from "../services/analyticsService";
 import { buildDashboardSummary } from "../services/dashboardService";
 import { AppDataContext } from "./AppDataContextValue";
 
-const STORAGE_KEY = "resume-shortlisting.uploadResults.v2";
+const STORAGE_KEY = "resume-shortlisting.uploadResults.v3";
+
+function loadStoredUploadResults() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    return Array.isArray(stored) ? stored : [];
+  } catch {
+    return [];
+  }
+}
 
 export function AppDataProvider({ children }) {
-  const [uploadResults, setUploadResults] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [uploadResults, setUploadResults] = useState(loadStoredUploadResults);
   const [uploadQueue, setUploadQueue] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [lastError, setLastError] = useState(null);

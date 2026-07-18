@@ -15,6 +15,6 @@ export function buildDashboardSummary(candidates) {
     lowConfidence,
     topScore: scored.length ? Math.max(...scored) : null,
     recentUploads: candidates.slice(-5).reverse(),
-    pipelineHealth: total ? "Synchronous upload parsing complete" : "Awaiting uploads",
+    pipelineHealth: scored.length ? "Parsing, scoring, and confidence complete" : total ? "Parsing complete; scores pending" : "Awaiting uploads",
   };
 }

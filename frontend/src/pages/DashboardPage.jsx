@@ -13,7 +13,7 @@ export default function DashboardPage() {
     { label: "Total Resumes", value: String(dashboard.total), delta: dashboard.total ? "Uploaded" : "Empty" },
     { label: "Processed", value: String(dashboard.processed), delta: dashboard.pipelineHealth },
     { label: "High Confidence", value: String(dashboard.highConfidence), delta: "Backend result" },
-    { label: "Top Score", value: dashboard.topScore ?? "N/A", delta: "If supplied" },
+    { label: "Top Score", value: dashboard.topScore ?? "N/A", delta: dashboard.topScore === null ? "Awaiting scored uploads" : "Scored" },
   ];
   const scoreDistribution = analytics.scoreDistribution;
   const confidenceDistribution = analytics.confidenceDistribution.length
@@ -82,7 +82,7 @@ export default function DashboardPage() {
                   ))}
                 </Bar>
               </BarChart>
-            </ResponsiveContainer> : <p className="page-copy">Scores are unavailable because the current backend upload response does not include scored candidate reports.</p>}
+            </ResponsiveContainer> : <p className="page-copy">Upload resumes after the latest backend restart to populate score distribution.</p>}
           </div>
         </Card>
 
@@ -106,7 +106,7 @@ export default function DashboardPage() {
                     <td className="mono">{upload.skills.length}</td>
                     <td className="muted">Current session</td>
                     <td>
-                      <StatusBadge tone="completed">Parsed</StatusBadge>
+                      <StatusBadge tone="completed">{upload.status}</StatusBadge>
                     </td>
                   </tr>
                 )) : (
