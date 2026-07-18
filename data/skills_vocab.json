@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Python",
+    "aliases": ["python"]
+  },
+  {
+    "name": "Java",
+    "aliases": ["java"]
+  },
+  {
+    "name": "C++",
+    "aliases": ["c++"]
+  },
+  {
+    "name": "C",
+    "aliases": ["c"]
+  },
+  {
+    "name": "SQL",
+    "aliases": ["sql"]
+  },
+  {
+    "name": "MongoDB",
+    "aliases": ["mongodb", "mongo db"]
+  },
+  {
+    "name": "React",
+    "aliases": ["react", "reactjs", "react.js"]
+  },
+  {
+    "name": "Node.js",
+    "aliases": ["node.js", "nodejs", "node"]
+  },
+  {
+    "name": "TensorFlow",
+    "aliases": ["tensorflow"]
+  },
+  {
+    "name": "PyTorch",
+    "aliases": ["pytorch"]
+  },
+  {
+    "name": "Docker",
+    "aliases": ["docker"]
+  },
+  {
+    "name": "Git",
+    "aliases": ["git"]
+  },
+  {
+    "name": "Go",
+    "aliases": ["go", "golang"]
+  }
+]

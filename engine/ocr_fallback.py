@@ -14,10 +14,16 @@ so identity holds for any caller still holding a reference mid-pipeline.
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List
 
-import pytesseract
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:  # pragma: no cover - exercised in environments without optional OCR deps
+    Image = None
+try:
+    import pytesseract
+except ImportError:  # pragma: no cover - exercised in environments without optional OCR deps
+    pytesseract = None
 
 # PyMuPDF >=1.24 exposes both `import pymupdf` (canonical) and the legacy
 # `import fitz` (same package) -- mirrors pdf_parser.py's import guard.
@@ -64,6 +70,9 @@ def apply_ocr_fallback(resume: ParsedResume) -> ParsedResume:
     "this resume's current text came from OCR," not "OCR was attempted."
     """
     if not needs_ocr(resume.word_count):
+        return resume
+
+    if pytesseract is None or Image is None:
         return resume
 
     try:
