@@ -12,6 +12,25 @@ export default function CandidatesPage() {
   const [globalFilter, setGlobalFilter] = useState("");
   const [expanded, setExpanded] = useState(null);
   const { candidates } = useAppData();
+  const exportCandidates = () => {
+    const rows = table.getFilteredRowModel().rows.map((row) => row.original);
+    const headers = ["name", "role", "college", "score", "confidence", "status", "email", "phone", "degree", "cgpa", "skills"];
+    const csvRows = [
+      headers.join(","),
+      ...rows.map((candidate) => headers.map((header) => csvValue(
+        header === "skills" ? candidate.skills.join("; ") : candidate[header],
+      )).join(",")),
+    ];
+    const blob = new Blob([csvRows.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "candidate_shortlist.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
   const columns = useMemo(() => [
     { accessorKey: "name", header: "Candidate" },
     { accessorKey: "role", header: "Role" },
@@ -36,7 +55,7 @@ export default function CandidatesPage() {
   return (
     <>
       <PageHeader
-        actions={<button className="button primary" type="button"><Download size={16} /> Export</button>}
+        actions={<button className="button primary" disabled={!candidates.length} onClick={exportCandidates} type="button"><Download size={16} /> Export</button>}
         description="Review, filter, sort, and inspect deterministic candidate matches."
         title="All Candidates"
       />
@@ -105,14 +124,30 @@ export default function CandidatesPage() {
           </table>
         </div>
         <div className="card__header">
-          <span className="muted">Showing {table.getRowModel().rows.length} candidates</span>
+          <span className="muted">Showing {table.getRowModel().rows.length} of {table.getFilteredRowModel().rows.length} candidates</span>
           <div className="topbar__actions">
+            <select
+              className="select"
+              onChange={(event) => table.setPageSize(Number(event.target.value))}
+              style={{ width: 120 }}
+              value={table.getState().pagination.pageSize}
+            >
+              {[10, 25, 50, 100].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>{pageSize} rows</option>
+              ))}
+            </select>
             <button className="icon-button" disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()} type="button"><ChevronLeft size={16} /></button>
-            <button className="button secondary" type="button">1</button>
+            <button className="button secondary" type="button">{table.getState().pagination.pageIndex + 1} / {table.getPageCount() || 1}</button>
             <button className="icon-button" disabled={!table.getCanNextPage()} onClick={() => table.nextPage()} type="button"><ChevronRight size={16} /></button>
           </div>
         </div>
       </Card>
     </>
   );
+}
+
+function csvValue(value) {
+  if (value === null || value === undefined) return "";
+  const text = String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
