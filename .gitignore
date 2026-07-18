@@ -56,3 +56,14 @@ coverage/
 # Cache
 # ===============================
 .cache/
+
+
+# Validation outputs
+validation_artifacts/
+
+# Generated outputs
+outputs/
+
+# Python cache
+__pycache__/
+*.pyc

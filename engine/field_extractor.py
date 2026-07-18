@@ -37,8 +37,8 @@ PHONE_CANDIDATE_PATTERN = re.compile(
 URL_PATTERN = re.compile(r"\b(?:https?://|www\.|linkedin\.com|github\.com)\S*", re.I)
 
 NAME_PATTERN = re.compile(
-    r"^[A-Z][a-z]+(?:[-'][A-Z][a-z]+)?"
-    r"(?:\s+[A-Z][a-z]+(?:[-'][A-Z][a-z]+)?){1,3}$"
+    r"^(?:[A-Z][a-z]+|[A-Z]{2,})(?:[-'][A-Z][a-z]+)?"
+    r"(?:\s+(?:[A-Z][a-z]+|[A-Z]{2,})(?:[-'][A-Z][a-z]+)?){1,3}$"
 )
 
 NAME_REJECT_WORDS = {
@@ -47,13 +47,20 @@ NAME_REJECT_WORDS = {
     "backend",
     "consultant",
     "developer",
+    "education",
     "engineer",
+    "experience",
     "frontend",
     "intern",
     "manager",
+    "objective",
+    "professional",
+    "profile",
     "resume",
     "scientist",
     "specialist",
+    "skills",
+    "summary",
 }
 
 EDUCATION_HEADER_PATTERN = re.compile(
@@ -81,7 +88,8 @@ INSTITUTION_KEYWORDS = (
 
 DEGREE_KEYWORD_PATTERN = re.compile(
     r"\b(?:b\.?\s?tech|m\.?\s?tech|b\.?\s?e\.?|m\.?\s?e\.?|b\.?\s?sc|"
-    r"m\.?\s?sc|b\.?\s?a\.?|m\.?\s?a\.?|b\.?\s?com|m\.?\s?com|mba|"
+    r"m\.?\s?sc|b\.?\s?a\.?|m\.?\s?a\.?|b\.?\s?com|m\.?\s?com|"
+    r"bba|bca|b\.?\s?des|bfa|mba|"
     r"ph\.?\s?d|doctorate|bachelor(?:'s)?|master(?:'s)?|degree|diploma|"
     r"engineering|science|arts|commerce|computer\s+applications)\b",
     re.I,
@@ -95,8 +103,10 @@ GRAD_CONTEXT_PATTERN = re.compile(
 
 CGPA_PATTERN = re.compile(
     r"\b(?:cgpa|gpa)\b\s*[:=-]?\s*"
-    r"(\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?|"
-    r"\d+(?:\.\d+)?\s+out\s+of\s+\d+(?:\.\d+)?)",
+    r"(?P<grade>\d+(?:\.\d+)?(?:\s*/\s*\d+(?:\.\d+)?)?|"
+    r"\d+(?:\.\d+)?\s+out\s+of\s+\d+(?:\.\d+)?)"
+    r"|\b(?:percentage|percent)\b\s*[:=-]?\s*"
+    r"(?P<percent>\d+(?:\.\d+)?\s*%)",
     re.I,
 )
 
@@ -261,7 +271,7 @@ def _first_valid_year(lines: Sequence[str]) -> int | None:
             for match in re.finditer(r"\b(?:19|20)\d{2}\b", line)
             if GRAD_YEAR_MIN <= int(match.group(0)) <= GRAD_YEAR_MAX
         ]
-        if len(years) >= 2 and re.search(r"\b(?:19|20)\d{2}\s*-\s*(?:19|20)\d{2}\b", line):
+        if len(years) >= 2 and re.search(r"\b(?:19|20)\d{2}\s*[-–—]\s*(?:19|20)\d{2}\b", line):
             return years[1]
         if years:
             return years[0]
@@ -270,7 +280,8 @@ def _first_valid_year(lines: Sequence[str]) -> int | None:
 
 def _extract_raw_cgpa(education_text: str) -> str | None:
     matches = _dedupe_preserve_order(
-        match.group(1).strip() for match in CGPA_PATTERN.finditer(education_text)
+        (match.group("grade") or match.group("percent")).strip()
+        for match in CGPA_PATTERN.finditer(education_text)
     )
     return matches[0] if matches else None
 

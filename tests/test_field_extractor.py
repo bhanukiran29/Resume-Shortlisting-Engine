@@ -93,6 +93,73 @@ GPA: 4.0
         self.assertIsNone(resume.grad_year)
         self.assertIsNone(resume.raw_cgpa)
 
+    def test_extracts_uppercase_name_and_en_dash_graduation_range(self):
+        resume = SimpleNamespace(
+            raw_text="""
+KARAN MALHOTRA
+Aspiring Python Developer
+karan@example.com | +91 98123 45605
+
+Education
+Bachelor of Technology — Computer Science & Engineering | 2023 – 2027 (Expected)
+Symbiosis Institute of Technology, Pune CGPA: 9.0 / 10.0
+"""
+        )
+
+        extract_fields(resume)
+
+        self.assertEqual(resume.name, "KARAN MALHOTRA")
+        self.assertEqual(resume.grad_year, 2027)
+        self.assertEqual(resume.raw_cgpa, "9.0 / 10.0")
+
+    def test_extracts_common_abbreviated_business_degree(self):
+        resume = SimpleNamespace(
+            raw_text="""
+Aarushi Sharma
+aarushi@example.com
+
+Education
+BBA, Business Analytics — Symbiosis Centre for Management Studies
+2021 - 2024
+"""
+        )
+
+        extract_fields(resume)
+
+        self.assertEqual(resume.degree, "BBA, Business Analytics — Symbiosis Centre for Management Studies")
+        self.assertEqual(resume.grad_year, 2024)
+
+    def test_uppercase_section_header_is_not_name(self):
+        resume = SimpleNamespace(
+            raw_text="""
+PROFESSIONAL SUMMARY
+dummy.email@example.com
+
+Education
+Bachelor's Degree with strong academic performance.
+"""
+        )
+
+        extract_fields(resume)
+
+        self.assertIsNone(resume.name)
+
+    def test_extracts_labeled_percentage_grade_from_education(self):
+        resume = SimpleNamespace(
+            raw_text="""
+Naveen Kumar
+naveen@example.com
+
+Education
+B.A. English Literature
+Osmania University, Hyderabad | 2022 – 2025 | Percentage: 74%
+"""
+        )
+
+        extract_fields(resume)
+
+        self.assertEqual(resume.raw_cgpa, "74%")
+
 
 if __name__ == "__main__":
     unittest.main()
