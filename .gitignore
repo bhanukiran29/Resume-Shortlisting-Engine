@@ -45,6 +45,7 @@ venv/
 env/
 
 __pycache__/
+**/__pycache__/
 *.pyc
 
 # ===============================
@@ -56,6 +57,7 @@ coverage/
 # Cache
 # ===============================
 .cache/
+.pytest_cache/
 
 
 # Validation outputs
