@@ -1,0 +1,139 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #121212;
+  color: white;
+}
+
+.container {
+  width: 80%;
+  max-width: 900px;
+  margin: auto;
+  padding: 40px;
+}
+
+h1 {
+  text-align: center;
+}
+
+select,
+textarea,
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  font-size: 16px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  cursor: pointer;
+}
+
+.chat-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.chat-message {
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-align: left;
+  border: 1px solid #333;
+  max-width: 90%;
+}
+
+.user-msg {
+  background: #162a45;
+  border-color: #2b4c7e;
+  align-self: flex-end;
+}
+
+.assistant-msg {
+  background: #1e1e1e;
+  border-color: #333;
+  align-self: flex-start;
+}
+
+.error-msg {
+  background: #442222;
+  border-color: #663333;
+  color: #ff8888;
+  align-self: flex-start;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #2d2d2d;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.copy-btn {
+  width: auto;
+  margin-top: 0;
+  padding: 6px 12px;
+  font-size: 14px;
+  background: #333;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.copy-btn:hover {
+  background: #444;
+}
+
+.markdown-content {
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.markdown-content pre {
+  background: #2d2d2d;
+  padding: 15px;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.spinner-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.provider-badge {
+  font-size: 12px;
+  background: #333;
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: #aaa;
+  font-weight: bold;
+  border: 1px solid #444;
+  text-transform: uppercase;
+}

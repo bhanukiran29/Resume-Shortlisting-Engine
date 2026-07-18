@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+pydantic
+PyMuPDF
+pdfplumber
+pytesseract
+Pillow
+rapidfuzz
+pandas
+numpy
+python-docx
+pytest
