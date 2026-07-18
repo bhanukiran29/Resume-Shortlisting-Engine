@@ -17,7 +17,7 @@ export function normalizeUploadToCandidate(uploadResult, index = 0) {
     skills,
     score: parsed.score ?? null,
     confidence: parsed.confidence ?? "Unavailable",
-    status: "Parsed",
+    status: parsed.parse_quality || "Parsed",
     raw: uploadResult,
   };
 }

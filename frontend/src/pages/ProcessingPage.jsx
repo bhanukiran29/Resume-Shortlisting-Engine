@@ -20,6 +20,14 @@ const stages = [
 export default function ProcessingPage() {
   const { isUploading, lastError, uploadQueue, uploadResults } = useAppData();
   const parsedCount = uploadQueue.filter((item) => item.status === "Parsed").length;
+  const pendingCount = isUploading ? uploadQueue.filter((item) => !["Parsed", "Failed"].includes(item.status)).length : 0;
+  const currentFile = isUploading ? uploadQueue.find((item) => !["Parsed", "Failed"].includes(item.status))?.name || "None" : "None";
+  const queueRows = isUploading && uploadQueue.length
+    ? uploadQueue.map((item) => ({ name: item.name, status: item.status }))
+    : uploadResults.map((result) => ({
+      name: result.parsed_data?.filename || result.file_path,
+      status: result.parsed_data?.parse_quality || "Parsed",
+    }));
   const progress = uploadQueue.length ? Math.round((parsedCount / uploadQueue.length) * 100) : uploadResults.length ? 100 : 0;
 
   return (
@@ -67,9 +75,9 @@ export default function ProcessingPage() {
         <div className="grid">
           <Card title="Live Status" icon={Clock}>
             {[
-              ["Queue", String(uploadQueue.length)],
+              ["Queue", String(pendingCount)],
               ["ETA", isUploading ? "Synchronous" : "N/A"],
-              ["Current File", uploadQueue.find((item) => item.status !== "Parsed")?.name || "None"],
+              ["Current File", currentFile],
               ["Errors", lastError ? "1" : "0"],
             ].map(([label, value]) => (
               <div className="settings-row" key={label}>
@@ -79,10 +87,10 @@ export default function ProcessingPage() {
             ))}
           </Card>
           <Card title="Processing Queue" icon={ListChecks}>
-            {(uploadQueue.length ? uploadQueue.map((item) => item.name) : uploadResults.map((result) => result.parsed_data?.filename || result.file_path)).map((file, index) => (
-              <div className="settings-row" key={file}>
-                <span>{file}</span>
-                {isUploading && index === 0 ? <StatusBadge tone="processing">Running</StatusBadge> : <span className="muted">{uploadQueue[index]?.status || "Parsed"}</span>}
+            {queueRows.map((item, index) => (
+              <div className="settings-row" key={`${item.name}-${index}`}>
+                <span>{item.name}</span>
+                {isUploading && !["Parsed", "Failed"].includes(item.status) ? <StatusBadge tone="processing">Running</StatusBadge> : <span className="muted">{item.status}</span>}
               </div>
             ))}
             {!uploadQueue.length && !uploadResults.length ? <p className="page-copy">No processing history yet. Upload resumes to populate this panel.</p> : null}

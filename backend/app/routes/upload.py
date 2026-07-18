@@ -1,5 +1,6 @@
 import os
 import shutil
+from pathlib import Path
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from backend.app.services.parser import ParserService
 
@@ -18,7 +19,11 @@ async def upload_file(file: UploadFile = File(...)):
     # Ensure upload directory exists
     os.makedirs(UPLOAD_DIR, exist_ok=True)
     
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    safe_filename = Path(file.filename).name
+    if not safe_filename:
+        raise HTTPException(status_code=400, detail="Invalid file name.")
+
+    file_path = os.path.join(UPLOAD_DIR, safe_filename)
     
     # Save the file
     try:

@@ -5,7 +5,7 @@ import { buildAnalytics } from "../services/analyticsService";
 import { buildDashboardSummary } from "../services/dashboardService";
 import { AppDataContext } from "./AppDataContextValue";
 
-const STORAGE_KEY = "resume-shortlisting.uploadResults";
+const STORAGE_KEY = "resume-shortlisting.uploadResults.v2";
 
 export function AppDataProvider({ children }) {
   const [uploadResults, setUploadResults] = useState(() => {
