@@ -22,16 +22,22 @@ def score_candidate(candidate: ScoredCandidate, jd: JobDescription) -> ScoredCan
         candidate.score_breakdown = None
         return candidate
 
+    required_skill_score = _skill_component(
+        len(candidate.matched_required), len(jd.required_skills), REQUIRED_SKILL_WEIGHT
+    )
+    preferred_skill_score = _skill_component(
+        len(candidate.matched_preferred), len(jd.preferred_skills), PREFERRED_SKILL_WEIGHT
+    )
+    cgpa_score = _cgpa_component(candidate.resume.normalized_cgpa, jd.min_cgpa)
+    practical_signal_score = _practical_component(candidate.resume.practical_experience)
+    subtotal = required_skill_score + preferred_skill_score + cgpa_score + practical_signal_score
+
     candidate.score_breakdown = ScoreBreakdown(
-        required_skill_score=_skill_component(
-            len(candidate.matched_required), len(jd.required_skills), REQUIRED_SKILL_WEIGHT
-        ),
-        preferred_skill_score=_skill_component(
-            len(candidate.matched_preferred), len(jd.preferred_skills), PREFERRED_SKILL_WEIGHT
-        ),
-        cgpa_score=_cgpa_component(candidate.resume.normalized_cgpa, jd.min_cgpa),
-        practical_signal_score=_practical_component(candidate.resume.practical_experience),
-        conflict_adjustment=_conflict_adjustment(candidate, jd),
+        required_skill_score=required_skill_score,
+        preferred_skill_score=preferred_skill_score,
+        cgpa_score=cgpa_score,
+        practical_signal_score=practical_signal_score,
+        conflict_adjustment=_conflict_adjustment(candidate, jd, subtotal),
     )
     return candidate
 
@@ -57,11 +63,12 @@ def _practical_component(practical_experience: list[str]) -> float:
     return PRACTICAL_SIGNAL_WEIGHT if practical_experience else 0.0
 
 
-def _conflict_adjustment(candidate: ScoredCandidate, jd: JobDescription) -> float:
+def _conflict_adjustment(candidate: ScoredCandidate, jd: JobDescription, subtotal: float) -> float:
     if not jd.required_skills:
         return 0.0
     missing_ratio = len(candidate.missing_required) / len(jd.required_skills)
-    return round(-CONFLICT_ADJUSTMENT_MAX * missing_ratio, 2)
+    raw_penalty = -CONFLICT_ADJUSTMENT_MAX * missing_ratio
+    return round(max(raw_penalty, -subtotal), 2)
 
 
 __all__ = ["score_candidate"]

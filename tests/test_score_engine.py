@@ -54,6 +54,22 @@ class ScoreEngineTests(unittest.TestCase):
 
         self.assertIsNone(candidate.score_breakdown)
 
+    def test_missing_required_penalty_never_makes_total_negative(self):
+        resume = ParsedResume(file_path="resume.pdf", parse_quality=ParseQuality.CLEAN)
+        jd = JobDescription(
+            job_id="jd",
+            title="Role",
+            slot_count=1,
+            required_skills=["Python", "SQL"],
+            preferred_skills=["Docker"],
+            min_cgpa=8.0,
+        )
+        candidate = match_candidate(resume, jd)
+
+        score_candidate(candidate, jd)
+
+        self.assertEqual(candidate.total_score, 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()
