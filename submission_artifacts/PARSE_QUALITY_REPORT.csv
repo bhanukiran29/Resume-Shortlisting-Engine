@@ -1,0 +1,2 @@
+file_name,parse_status,word_count,used_ocr,what_failed_if_applicable
+resume.pdf,Partial,118,false,"Word yield (118) is below the Clean floor (150). Native extraction succeeded; core candidate fields were extracted, but the resume is below the configured Clean word-count threshold."

@@ -1,0 +1,79 @@
+{
+  "allocation": "Unscored",
+  "confidence": "Medium",
+  "explanation": [],
+  "file_name": "resume.pdf",
+  "job_id": "backend",
+  "matched_preferred": [
+    {
+      "is_required": false,
+      "match_type": "exact",
+      "name": "Docker"
+    },
+    {
+      "is_required": false,
+      "match_type": "exact",
+      "name": "Git"
+    }
+  ],
+  "matched_required": [
+    {
+      "is_required": true,
+      "match_type": "exact",
+      "name": "Python"
+    },
+    {
+      "is_required": true,
+      "match_type": "exact",
+      "name": "SQL"
+    }
+  ],
+  "missing_required": [],
+  "overall_score": 70.0,
+  "parse_quality": "Partial",
+  "parse_quality_reason": "Word yield (118) is below the Clean floor (150). [prior stage: Provisional value from pdf_parser.py -- awaiting field-completeness check from parse_quality.py.]",
+  "parsed_fields": {
+    "college": "National Institute of Technology Delhi",
+    "degree": "B.Tech Computer Science",
+    "email": "asha@example.com",
+    "grad_year": 2022,
+    "name": "Asha Rao",
+    "normalized_cgpa": 8.7,
+    "phone": "+91 98765 43210",
+    "raw_cgpa": "8.7/10",
+    "skills": [
+      {
+        "match_type": "exact",
+        "name": "Python"
+      },
+      {
+        "match_type": "exact",
+        "name": "SQL"
+      },
+      {
+        "match_type": "exact",
+        "name": "Docker"
+      },
+      {
+        "match_type": "exact",
+        "name": "Git"
+      },
+      {
+        "match_type": "exact",
+        "name": "React"
+      },
+      {
+        "match_type": "exact",
+        "name": "Node.js"
+      }
+    ]
+  },
+  "score_breakdown": {
+    "cgpa_score": 15,
+    "conflict_adjustment": -0.0,
+    "practical_signal_score": 0.0,
+    "preferred_skill_score": 15.0,
+    "required_skill_score": 40.0
+  },
+  "warnings": []
+}

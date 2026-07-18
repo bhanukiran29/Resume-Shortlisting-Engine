@@ -62,9 +62,11 @@ coverage/
 
 # Validation outputs
 validation_artifacts/
+stitch_export/
 
 # Generated outputs
 outputs/
+uploads/
 
 # Python cache
 __pycache__/
