@@ -5,7 +5,7 @@ import { buildAnalytics } from "../services/analyticsService";
 import { buildDashboardSummary } from "../services/dashboardService";
 import { AppDataContext } from "./AppDataContextValue";
 
-const STORAGE_KEY = "resume-shortlisting.uploadResults.v3";
+const STORAGE_KEY = "resume-shortlisting.uploadResults.v4";
 
 function loadStoredUploadResults() {
   try {

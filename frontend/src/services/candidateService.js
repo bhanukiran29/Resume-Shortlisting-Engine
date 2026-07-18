@@ -3,7 +3,10 @@ export function normalizeUploadToCandidate(uploadResult, index = 0) {
   const contact = parsed.contact_info ?? {};
   const skills = Array.isArray(parsed.skills) ? parsed.skills : [];
   const education = Array.isArray(parsed.education) ? parsed.education : [];
-  const score = parsed.score ?? parsed.overall_score ?? null;
+  const rawScore = parsed.score ?? parsed.overall_score;
+  const score = typeof rawScore === "number" && Number.isFinite(rawScore)
+    ? Math.min(100, Math.max(0, rawScore))
+    : null;
 
   return {
     id: uploadResult?.file_path || parsed.filename || `candidate-${index}`,
