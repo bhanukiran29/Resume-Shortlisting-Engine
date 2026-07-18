@@ -7,14 +7,14 @@ import { Progress } from "../components/ui/Progress";
 import { useAppData } from "../hooks/useAppData";
 
 const stageDefinitions = [
-  { name: "Ingestion", icon: FileText, backendSupported: true },
-  { name: "PDF Parse", icon: ScanText, backendSupported: true },
-  { name: "OCR", icon: Sparkles, backendSupported: true },
-  { name: "Field Extraction", icon: ListChecks, backendSupported: true },
-  { name: "Grade Normalization", icon: Gauge, backendSupported: true },
-  { name: "Skill Extraction", icon: BrainCircuit, backendSupported: true },
-  { name: "Scoring", icon: Timer, backendSupported: false },
-  { name: "Confidence", icon: ShieldCheck, backendSupported: false },
+  { name: "Ingestion", icon: FileText },
+  { name: "PDF Parse", icon: ScanText },
+  { name: "OCR", icon: Sparkles },
+  { name: "Field Extraction", icon: ListChecks },
+  { name: "Grade Normalization", icon: Gauge },
+  { name: "Skill Extraction", icon: BrainCircuit },
+  { name: "Scoring", icon: Timer },
+  { name: "Confidence", icon: ShieldCheck },
 ];
 
 export default function ProcessingPage() {
@@ -25,7 +25,7 @@ export default function ProcessingPage() {
   const currentFile = isUploading ? uploadQueue.find((item) => !["Parsed", "Failed"].includes(item.status))?.name || "None" : "None";
   const stages = stageDefinitions.map((stage) => ({
     ...stage,
-    state: !stage.backendSupported ? "pending" : isUploading ? "active" : hasResults ? "done" : "pending",
+    state: isUploading ? "active" : hasResults ? "done" : "pending",
   }));
   const queueRows = isUploading && uploadQueue.length
     ? uploadQueue.map((item) => ({ name: item.name, status: item.status }))

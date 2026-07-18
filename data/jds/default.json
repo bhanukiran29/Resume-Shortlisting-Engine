@@ -1,0 +1,8 @@
+{
+  "job_id": "default-ai-engineer",
+  "title": "AI Engineer",
+  "slot_count": 10,
+  "required_skills": ["Python", "SQL"],
+  "preferred_skills": ["Docker", "Git", "React"],
+  "min_cgpa": 8.0
+}

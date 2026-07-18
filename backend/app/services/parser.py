@@ -2,13 +2,21 @@ from pathlib import Path
 
 from docx import Document
 
+from config import BASE_DIR
+from engine.confidence_engine import assign_confidence
 from engine.field_extractor import extract_fields
 from engine.grade_normalizer import normalize_grade
+from engine.jd_loader import JDValidationError, load_jd
+from engine.matcher import match_candidate
 from engine.models import ParsedResume, ParseQuality
 from engine.ocr_fallback import apply_ocr_fallback
 from engine.parse_quality import classify_parse_quality
 from engine.pdf_parser import needs_ocr, parse_pdf
+from engine.score_engine import score_candidate
 from engine.skill_extractor import extract_skills
+
+
+DEFAULT_UPLOAD_JD_PATH = BASE_DIR / "data" / "jds" / "default.json"
 
 class ParserService:
     def __init__(self):
@@ -25,8 +33,9 @@ class ParserService:
         resume = extract_fields(resume)
         resume = normalize_grade(resume)
         resume = extract_skills(resume)
+        scoring_data = self._score_resume(resume)
 
-        return {
+        parsed_data = {
             "filename": resume.file_name,
             "extracted_text": resume.raw_text or "",
             "parse_quality": resume.parse_quality.value,
@@ -53,6 +62,8 @@ class ParserService:
                 if value is not None
             ],
         }
+        parsed_data.update(scoring_data)
+        return parsed_data
 
     def parse_job_description(self, text: str) -> dict:
         """
@@ -129,3 +140,49 @@ class ParserService:
             used_ocr=False,
             is_multi_column=False,
         )
+
+    def _score_resume(self, resume: ParsedResume) -> dict:
+        if not DEFAULT_UPLOAD_JD_PATH.exists():
+            return {
+                "scoring_available": False,
+                "scoring_reason": f"Default JD not found: {DEFAULT_UPLOAD_JD_PATH}",
+            }
+
+        try:
+            jd = load_jd(DEFAULT_UPLOAD_JD_PATH)
+        except JDValidationError as exc:
+            return {
+                "scoring_available": False,
+                "scoring_reason": str(exc),
+            }
+
+        candidate = match_candidate(resume, jd)
+        candidate = score_candidate(candidate, jd)
+        candidate = assign_confidence(candidate)
+        breakdown = candidate.score_breakdown
+
+        return {
+            "scoring_available": True,
+            "job_id": candidate.job_id,
+            "job_title": jd.title,
+            "score": candidate.total_score,
+            "overall_score": candidate.total_score,
+            "confidence": candidate.confidence.value if candidate.confidence else None,
+            "allocation": candidate.allocation.value,
+            "score_breakdown": {
+                "required_skill_score": breakdown.required_skill_score,
+                "preferred_skill_score": breakdown.preferred_skill_score,
+                "cgpa_score": breakdown.cgpa_score,
+                "practical_signal_score": breakdown.practical_signal_score,
+                "conflict_adjustment": breakdown.conflict_adjustment,
+            } if breakdown else None,
+            "matched_required": [
+                {"name": skill.name, "match_type": skill.match_type.value}
+                for skill in candidate.matched_required
+            ],
+            "matched_preferred": [
+                {"name": skill.name, "match_type": skill.match_type.value}
+                for skill in candidate.matched_preferred
+            ],
+            "missing_required": list(candidate.missing_required),
+        }
