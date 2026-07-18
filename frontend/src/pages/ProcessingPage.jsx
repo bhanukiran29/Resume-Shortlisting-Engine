@@ -6,22 +6,27 @@ import { Card } from "../components/ui/Card";
 import { Progress } from "../components/ui/Progress";
 import { useAppData } from "../hooks/useAppData";
 
-const stages = [
-  { name: "Ingestion", icon: FileText, state: "done" },
-  { name: "PDF Parse", icon: ScanText, state: "done" },
-  { name: "OCR", icon: Sparkles, state: "done" },
-  { name: "Field Extraction", icon: ListChecks, state: "done" },
-  { name: "Grade Normalization", icon: Gauge, state: "active" },
-  { name: "Skill Matching", icon: BrainCircuit, state: "pending" },
-  { name: "Scoring", icon: Timer, state: "pending" },
-  { name: "Confidence", icon: ShieldCheck, state: "pending" },
+const stageDefinitions = [
+  { name: "Ingestion", icon: FileText, backendSupported: true },
+  { name: "PDF Parse", icon: ScanText, backendSupported: true },
+  { name: "OCR", icon: Sparkles, backendSupported: true },
+  { name: "Field Extraction", icon: ListChecks, backendSupported: true },
+  { name: "Grade Normalization", icon: Gauge, backendSupported: true },
+  { name: "Skill Extraction", icon: BrainCircuit, backendSupported: true },
+  { name: "Scoring", icon: Timer, backendSupported: false },
+  { name: "Confidence", icon: ShieldCheck, backendSupported: false },
 ];
 
 export default function ProcessingPage() {
   const { isUploading, lastError, uploadQueue, uploadResults } = useAppData();
+  const hasResults = uploadResults.length > 0;
   const parsedCount = uploadQueue.filter((item) => item.status === "Parsed").length;
   const pendingCount = isUploading ? uploadQueue.filter((item) => !["Parsed", "Failed"].includes(item.status)).length : 0;
   const currentFile = isUploading ? uploadQueue.find((item) => !["Parsed", "Failed"].includes(item.status))?.name || "None" : "None";
+  const stages = stageDefinitions.map((stage) => ({
+    ...stage,
+    state: !stage.backendSupported ? "pending" : isUploading ? "active" : hasResults ? "done" : "pending",
+  }));
   const queueRows = isUploading && uploadQueue.length
     ? uploadQueue.map((item) => ({ name: item.name, status: item.status }))
     : uploadResults.map((result) => ({
@@ -64,9 +69,9 @@ export default function ProcessingPage() {
               <Progress value={uploadResults.length ? 100 : 0} />
             </div>
             <div className="card" style={{ padding: 22, borderColor: "rgba(128,131,255,.45)" }}>
-              <StatusBadge tone={isUploading ? "processing" : "medium"}>{isUploading ? "Active" : "Idle"}</StatusBadge>
+              <StatusBadge tone={isUploading ? "processing" : hasResults ? "completed" : "medium"}>{isUploading ? "Active" : hasResults ? "Complete" : "Idle"}</StatusBadge>
               <h3 className="card-title" style={{ marginTop: 16 }}>Grade Normalization</h3>
-              <p className="page-copy">Converting CGPA, GPA, and percentage values to a 10-point scale.</p>
+              <p className="page-copy">{hasResults ? "CGPA, GPA, and percentage values have been normalized where extractable." : "Converting CGPA, GPA, and percentage values to a 10-point scale."}</p>
               <Progress value={progress} />
             </div>
           </div>
